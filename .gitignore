@@ -6,3 +6,5 @@
 # IntelliJ
 
 .idea/
+target/
+*/target/
