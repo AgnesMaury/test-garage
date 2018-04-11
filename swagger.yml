@@ -1,0 +1,298 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Swagger Parking"
+paths:
+  /garages:
+    post:
+      summary: "Create a new garage"
+      operationId: "addGarage"
+      parameters:
+        - in: "body"
+          name: "garage"
+          description: "Garage to be created"
+          required: true
+          schema:
+            $ref: "#/definitions/GarageEntry"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Garage"
+        400:
+          description: "Invalid Input"
+  /garages/{garageId}:
+    get:
+      summary: "Retrieve an existing garage"
+      operationId: "retrieveGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage to modify"
+          required: true
+          type: "string"
+          format: uuid
+      responses:
+        200:
+          description: "Found"
+          schema:
+            $ref: "#/definitions/Garage"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+    put:
+      summary: "Modify an existing garage"
+      operationId: "modifyGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage to modify"
+          required: true
+          type: "string"
+          format: uuid
+        - in: "body"
+          name: "garage"
+          description: "Garage to be modified"
+          required: true
+          schema:
+            $ref: "#/definitions/GarageEntry"
+      responses:
+        200:
+          description: "Modified"
+          schema:
+            $ref: "#/definitions/Garage"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+    delete:
+      summary: "Delete an existing garage"
+      operationId: "deleteGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage to delete"
+          required: true
+          type: "string"
+          format: uuid
+      responses:
+        200:
+          description: "Deleted"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+  /garages/{garageId}/cars:
+    get:
+      summary: "Retrieve all cars from an existing garage"
+      description: "Can be filtered with minimum and maximum price"
+      operationId: "retrieveAllCars"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage"
+          required: true
+          type: "string"
+          format: uuid
+        - name: "minimumPrice"
+          in: "header"
+          description: "Minimum price of the car used as a filter"
+          required: false
+          type: "number"
+        - name: "maximumPrice"
+          in: "header"
+          description: "Maximum price of the car used as a filter"
+          required: false
+          type: "number"
+      responses:
+        201:
+          description: "Found"
+          schema:
+            $ref: "#/definitions/Car"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+    post:
+      summary: "Add a car to an existing garage"
+      operationId: "addCarToGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage"
+          required: true
+          type: "string"
+          format: uuid
+        - in: "body"
+          name: "car"
+          description: "Car to add"
+          required: true
+          schema:
+            $ref: "#/definitions/CarEntry"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Car"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+        405:
+          description: "Garage is full"
+    delete:
+      summary: "Delete all cars of an existing garage"
+      operationId: "deleteAllCarsOfGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage"
+          required: true
+          type: "string"
+          format: uuid
+      responses:
+        200:
+          description: "Deleted"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+  /garages/{garageId}/cars/{carId}:
+    get:
+      summary: "Retrieve an existing car from a given garage"
+      operationId: "retrieveCarFromGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage"
+          required: true
+          type: "string"
+          format: uuid
+        - name: "carId"
+          in: "path"
+          description: "ID of car"
+          required: true
+          type: "string"
+          format: uuid
+      responses:
+        200:
+          description: "Found"
+          schema:
+            $ref: "#/definitions/Car"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+    put:
+      summary: "Modify the matriculation of an existing car"
+      operationId: "modifyCarMatriculation"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage"
+          required: true
+          type: "string"
+          format: uuid
+        - name: "carId"
+          in: "path"
+          description: "ID of car"
+          required: true
+          type: "string"
+          format: uuid
+        - name: "matriculation"
+          in: "body"
+          description: "New matriculation of the car"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Modified"
+          schema:
+            $ref: "#/definitions/Car"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+    delete:
+      summary: "Delete an existing car from a given garage"
+      operationId: "deleteCarFromGarage"
+      parameters:
+        - name: "garageId"
+          in: "path"
+          description: "ID of garage"
+          required: true
+          type: "string"
+          format: uuid
+        - name: "carId"
+          in: "path"
+          description: "ID of car"
+          required: true
+          type: "string"
+          format: uuid
+      responses:
+        200:
+          description: "Deleted"
+        400:
+          description: "Invalid Input"
+        404:
+          description: "Not found"
+definitions:
+  GarageEntry:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      address:
+        type: "string"
+      maximumCapacity:
+        type: "integer"
+  Garage:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: uuid
+      name:
+        type: "string"
+      address:
+        type: "string"
+      creationDate:
+        type: "string"
+        format: "date-time"
+      maximumCapacity:
+        type: "integer"
+  CarEntry:
+    type: "object"
+    properties:
+      matriculation:
+        type: "string"
+      brand:
+        type: "string"
+      model:
+        type: "string"
+      color:
+        type: "string"
+      commissioningDate:
+        type: "string"
+      price:
+        type: "number"
+  Car:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: uuid
+      matriculation:
+        type: "string"
+      brand:
+        type: "string"
+      model:
+        type: "string"
+      color:
+        type: "string"
+      commissioningDate:
+        type: "string"
+      price:
+        type: "number"
