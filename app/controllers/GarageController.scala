@@ -16,93 +16,61 @@ class GarageController @Inject()(service: GarageService, cc: ControllerComponent
   def createGarage() = Action { request =>
     request.body.asJson match {
       case None => BadRequest(MissingBodyError.message)
-      case Some(json) => json.validate[Garage] match {
-        case JsSuccess(garage, _) => service.createGarage(garage)
-        case JsError(_) => BadRequest(DeserializeError(json.toString()).message)
+      case Some(json) => Garage.readGarage(json) match {
+        case Success(garage) => service.createGarage(garage)
+        case Failure(t) => BadRequest(DeserializeError(t).message)
       }
     }
   }
 
-  def retrieveGarage(garageId: String) = Action { _ =>
-    Try(UUID.fromString(garageId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(garageId).message)
-      case Success(_) => service.retrieveGarage(garageId)
-    }
+  def retrieveGarage(garageId: UUID) = Action { _ =>
+    service.retrieveGarage(garageId.toString)
   }
 
-  def modifyGarage(garageId: String) = Action { request =>
-    Try(UUID.fromString(garageId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(garageId).message)
-      case Success(uuid) =>
-        request.body.asJson match {
-          case None => BadRequest(MissingBodyError.message)
-          case Some(json) => json.validate[Garage] match {
-            case JsSuccess(garage, _) => service.modifyGarage(garage.copy(id = uuid))
-            case JsError(_) => BadRequest(DeserializeError(json.toString()).message)
-          }
-        }
-    }
-  }
-
-  def deleteGarage(garageId: String) = Action { _ =>
-    Try(UUID.fromString(garageId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(garageId).message)
-      case Success(_) => service.deleteGarage(garageId)
-    }
-  }
-
-  def retrieveAllCars(garageId: String) = Action { _ =>
-    Try(UUID.fromString(garageId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(garageId).message)
-      case Success(_) => service.retrieveAllCars(garageId)
-    }
-  }
-
-  def addCarToGarage(garageId: String) = Action { request =>
-    Try(UUID.fromString(garageId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(garageId).message)
-      case Success(uuid) =>
-        request.body.asJson match {
-          case None => BadRequest(MissingBodyError.message)
-          case Some(json) => json.validate[Car] match {
-            case JsSuccess(car, _) => service.addCarToGarage(car.copy(garageId = uuid))
-            case JsError(_) => BadRequest(DeserializeError(json.toString()).message)
-          }
-        }
-    }
-  }
-
-  def deleteAllCarsOfGarage(garageId: String) = Action { _ =>
-    Try(UUID.fromString(garageId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(garageId).message)
-      case Success(_) => service.deleteAllCarsOfGarage(garageId)
-    }
-  }
-
-  def retrieveCarFromGarage(carId: String) = Action { _ =>
-    Try(UUID.fromString(carId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(carId).message)
-      case Success(_) => service.retrieveCar(carId)
-    }
-  }
-
-  def modifyCarMatriculation(carId: String) = Action { request =>
-    Try(UUID.fromString(carId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(carId).message)
-      case Success(_) => request.body.asJson match {
-        case None => BadRequest(MissingBodyError.message)
-        case Some(json) => json.validate[String] match {
-          case JsSuccess(matriculation, _) => service.modifyCarMatriculation(carId, matriculation)
-          case JsError(_) => BadRequest(DeserializeError(json.toString()).message)
-        }
+  def modifyGarage(garageId: UUID) = Action { request =>
+    request.body.asJson match {
+      case None => BadRequest(MissingBodyError.message)
+      case Some(json) => Garage.readGarage(json) match {
+        case Success(garage) => service.modifyGarage(garage.copy(id = garageId))
+        case Failure(t) => BadRequest(DeserializeError(t).message)
       }
     }
   }
 
-  def deleteCarFromGarage(carId: String) = Action { _ =>
-    Try(UUID.fromString(carId)) match {
-      case Failure(_) => BadRequest(IncorrectIdError(carId).message)
-      case Success(_) => service.deleteCar(carId)
+  def deleteGarage(garageId: UUID) = Action { _ =>
+    service.deleteGarage(garageId.toString)
+  }
+
+  def retrieveAllCars(garageId: UUID) = Action { _ =>
+    service.retrieveAllCars(garageId.toString)
+  }
+
+  def addCarToGarage(garageId: UUID) = Action { request =>
+    request.body.asJson match {
+      case None => BadRequest(MissingBodyError.message)
+      case Some(json) => Car.readCar(json) match {
+        case Success(car) => service.addCarToGarage(car.copy(garageId = garageId))
+        case Failure(t) => BadRequest(DeserializeError(t).message)
+      }
     }
+  }
+
+  def deleteAllCarsOfGarage(garageId: UUID) = Action { _ =>
+    service.deleteAllCarsOfGarage(garageId.toString)
+  }
+
+  def retrieveCarFromGarage(garageId: UUID, carId: UUID) = Action { _ =>
+    service.retrieveCar(carId.toString)
+  }
+
+  def modifyCarMatriculation(garageId: UUID, carId: UUID) = Action { request =>
+    request.body.asText match {
+      case None => BadRequest(MissingBodyError.message)
+      case Some(matriculation) => service.modifyCarMatriculation(carId.toString, matriculation)
+    }
+  }
+
+  def deleteCarFromGarage(garageId: UUID, carId: UUID) = Action { _ =>
+    service.deleteCar(carId.toString)
   }
 }

@@ -6,11 +6,10 @@ import java.util.UUID
 
 import javax.inject.Inject
 import model.{Car, Garage}
-import models.DatabaseConstants
 import models.DatabaseConstants._
 import play.api.db._
 import play.api.libs.json.Json.toJson
-import play.api.mvc.Results.{Created, InternalServerError, MethodNotAllowed, NotFound, Ok}
+import play.api.mvc.Results._
 
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Success, Try}
@@ -59,8 +58,12 @@ class GarageService @Inject()(db: Database) {
       statement.setInt(3, garage.maximumCapacity)
       statement.setString(4, garage.id.toString)
 
-      statement.executeUpdate()
-      Ok(toJson(garage))
+      val result = statement.executeUpdate()
+      if (result == 0) {
+        NotFound
+      } else {
+        Ok(toJson(garage))
+      }
     } catch {
       case t: Throwable => InternalServerError(t.getMessage)
     } finally {
@@ -117,8 +120,8 @@ class GarageService @Inject()(db: Database) {
       isGarageFull(car.garageId.toString, connection) match {
         case Failure(t) => InternalServerError(t.getMessage)
         case Success(None) => NotFound
-        case Success(Some(false)) => MethodNotAllowed
-        case Success(Some(true)) =>
+        case Success(Some(true)) => MethodNotAllowed
+        case Success(Some(false)) =>
           val statement = connection.prepareStatement(CREATE_CAR_IN_GARAGE)
 
           statement.setString(1, car.id.toString)
@@ -126,7 +129,7 @@ class GarageService @Inject()(db: Database) {
           statement.setString(3, car.brand)
           statement.setString(4, car.model)
           statement.setString(5, car.color)
-          statement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.from(car.commissioningDate)))
+          statement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.from(car.commissioningDate.atStartOfDay())))
           statement.setDouble(7, car.price)
           statement.setString(8, car.garageId.toString)
 

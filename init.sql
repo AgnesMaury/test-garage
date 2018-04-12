@@ -15,6 +15,6 @@ CREATE TABLE cars (
     model VARCHAR(255) NOT NULL,
     color VARCHAR(255) NOT NULL,
     commissioning_date TIMESTAMP NOT NULL,
-    price DOUBLE NOT NULL,
+    price REAL NOT NULL,
     garage_id VARCHAR(255) NOT NULL
 );

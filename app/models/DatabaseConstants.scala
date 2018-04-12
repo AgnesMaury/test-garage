@@ -11,7 +11,7 @@ object DatabaseConstants {
   val CREATE_CAR_IN_GARAGE = "INSERT INTO cars (id, matriculation, brand, model, color, commissioning_date, price, garage_id) VALUES(?,?,?,?,?,?,?,?)"
   val DELETE_ALL_CARS_OF_GARAGE = "DELETE FROM cars WHERE garage_id = ?"
   val RETRIEVE_CAR = "SELECT * FROM cars WHERE id = ?"
-  val UPDATE_CAR_MATRICULATION = "UPDATE cars SET matriculation = ? WHERE id = ? AND garage_id = ?"
+  val UPDATE_CAR_MATRICULATION = "UPDATE cars SET matriculation = ? WHERE id = ?"
   val DELETE_CAR = "DELETE FROM cars WHERE id = ?"
 
   val RETRIEVE_GARAGE_CAPACITY = "SELECT count(*) FROM cars WHERE garage_id = ?"
