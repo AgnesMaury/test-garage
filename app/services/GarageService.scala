@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 import javax.inject.Inject
-import model.{Car, Garage}
+import models.{Car, Garage}
 import models.DatabaseConstants._
 import play.api.db._
 import play.api.libs.json.Json.toJson

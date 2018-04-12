@@ -3,13 +3,11 @@ package controllers
 import java.util.UUID
 
 import javax.inject.Inject
-import model.{Car, Garage}
 import models._
-import play.api.libs.json._
 import play.api.mvc._
 import services.GarageService
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 class GarageController @Inject()(service: GarageService, cc: ControllerComponents) extends AbstractController(cc) {
 
